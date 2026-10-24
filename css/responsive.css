@@ -1,0 +1,64 @@
+/* ==========================================================
+   Responsive: tablet and phone overrides
+   ========================================================== */
+
+@media (max-width: 1000px) {
+  .stats,
+  .detailstats {
+    grid-template-columns: repeat(2, 1fr);
+  }
+
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 700px) {
+  .app {
+    grid-template-columns: 1fr;
+  }
+
+  aside {
+    padding: 12px;
+  }
+
+  .nav {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .nav a {
+    text-align: center;
+    padding: 9px 4px;
+    font-size: 12px;
+  }
+
+  .sidebar-footer {
+    grid-template-columns: 1fr auto;
+    align-items: center;
+  }
+
+  main {
+    padding: 15px;
+  }
+
+  .top {
+    align-items: flex-start;
+  }
+
+  .top h1 {
+    font-size: 24px;
+  }
+
+  .top-actions {
+    display: none;
+  }
+
+  .ewaste-banner {
+    align-items: flex-start;
+  }
+
+  .ewaste-icons {
+    font-size: 18px;
+    letter-spacing: 1px;
+  }
+}

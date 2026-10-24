@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Recycling history | EcoVault Admin</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body class="auth-pending">
+  <div class="auth-loader">Checking login…</div>
+
+  <div id="app" class="app">
+    <!-- Sidebar + header are filled by js/components/layout.js -->
+    <aside id="sidebar"></aside>
+
+    <main>
+      <header class="top" id="pageHeader"></header>
+
+      <!-- ================= RECYCLING ================= -->
+      <div class="stats">
+        <div class="stat"><label>Awaiting pickup</label><strong id="recAwaiting">0 kg</strong></div>
+        <div class="stat"><label>Sent to recyclers</label><strong id="recSent">0 kg</strong></div>
+        <div class="stat"><label>Recorded batches</label><strong id="batchCount">0</strong></div>
+        <div class="stat"><label>Confirmed recycled</label><strong id="recConfirmed">0</strong></div>
+      </div>
+
+      <div class="card">
+        <div class="cardhead">
+          <div><h2>Recycling history</h2><div class="sub">Track transfer to authorized recycling facilities</div></div>
+          <button class="primary" id="addRecycle">+ Record transfer</button>
+        </div>
+        <div class="toolbar">
+          <input class="grow" id="recycleSearch" placeholder="Search batch, facility or bin">
+          <select id="recycleFilter">
+            <option value="all">All stages</option>
+            <option>Awaiting pickup</option>
+            <option>Sent to recycler</option>
+            <option>Recycled confirmed</option>
+          </select>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Batch ID</th><th>Source bin</th><th>Recycler / facility</th><th>Weight</th><th>Date</th><th>Stage</th></tr></thead>
+            <tbody id="recycleTable"></tbody>
+          </table>
+        </div>
+        <p class="smallnote">Mark “Recycled confirmed” only after confirmation from the recycler.</p>
+      </div>
+    </main>
+  </div>
+
+  <div id="modalHost"></div>
+  <div id="toast" class="toast hidden"></div>
+
+  <script type="module" src="../js/pages/recycling.js"></script>
+</body>
+</html>

@@ -1,0 +1,133 @@
+/* ==========================================================
+   Base: colours, reset, typography, buttons and form fields
+   Change the brand colours here (they are used everywhere).
+   ========================================================== */
+
+:root {
+  --g: #147a52;      /* primary green */
+  --p: #fff;         /* panel / card background */
+  --bg: #f3f7f4;     /* page background */
+  --ink: #193126;    /* main text */
+  --mut: #718078;    /* muted text */
+  --line: #e1e9e3;   /* borders */
+  --dark: #102b20;   /* sidebar / toast */
+  --warn-bg: #fff0d3;
+  --warn-ink: #a65e00;
+  --bad-bg: #ffe3e3;
+  --bad-ink: #b52c2c;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font: 15px system-ui, Arial;
+  background: linear-gradient(135deg, #f3f7f4 0%, #eef7f0 55%, #f5f8f4 100%);
+  color: var(--ink);
+}
+
+/* Subtle circuit-board pattern behind the page */
+body:before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  opacity: 0.12;
+  z-index: -1;
+  background-image:
+    radial-gradient(circle at 15% 20%, #2d9b61 0 2px, transparent 3px),
+    radial-gradient(circle at 80% 30%, #2d9b61 0 2px, transparent 3px),
+    linear-gradient(90deg, transparent 49%, #8eb99c 50%, transparent 51%),
+    linear-gradient(0deg, transparent 49%, #8eb99c 50%, transparent 51%);
+  background-size: 80px 80px, 110px 110px, 42px 42px, 42px 42px;
+}
+
+button,
+input,
+select {
+  font: inherit;
+}
+
+/* Use class="btn" to make a link look like a button */
+button,
+.btn {
+  cursor: pointer;
+  border: 0;
+  border-radius: 10px;
+  padding: 10px 14px;
+  font-weight: 650;
+}
+
+.btn {
+  display: inline-block;
+  text-decoration: none;
+  font-size: 15px;
+}
+
+button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.primary {
+  background: var(--g);
+  color: #fff;
+}
+
+.secondary {
+  background: #fff;
+  border: 1px solid var(--line);
+  color: var(--ink);
+}
+
+.wide {
+  width: 100%;
+  margin-top: 8px;
+}
+
+.hidden {
+  display: none !important;
+}
+
+.muted {
+  color: var(--mut);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.sub {
+  color: var(--mut);
+  font-size: 12px;
+}
+
+.smallnote {
+  font-size: 11px;
+  color: var(--mut);
+  line-height: 1.5;
+  margin-top: 12px;
+}
+
+/* Form fields (modals, login) */
+.field {
+  display: grid;
+  gap: 6px;
+  margin: 15px 0;
+}
+
+.field label {
+  font-size: 13px;
+  font-weight: 700;
+}
+
+.field input,
+.field select,
+.toolbar input,
+.toolbar select {
+  width: 100%;
+  padding: 11px;
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  background: #fff;
+}

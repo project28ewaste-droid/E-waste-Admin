@@ -3,19 +3,72 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>IoT Based Smart E-Waste Bin | EcoVault Admin</title>
-  <link rel="stylesheet" href="style.css">
+  <title>Dashboard overview | EcoVault Admin</title>
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/responsive.css">
 </head>
-<body>
-<div id="app" class="app"><aside><div class="brand">♻ EcoVault</div><div class="muted" style="color:#a8c2b1">ADMIN OPERATIONS</div><nav class="nav" id="nav"><button class="active" data-page="overview">▦ Overview</button><button data-page="bins">▤ Dustbins</button><button data-page="recycling">♻ Recycling</button><button data-page="vehicles">🚚 Vehicles</button><button data-page="users">♙ Users & Deposits</button><button data-page="rewards">✦ Rewards</button></nav><div class="note">IoT E-Waste Management<br>Frontend prototype · sample data</div></aside>
-<main><header class="top"><div><div style="color:var(--g);font-size:12px;font-weight:800;letter-spacing:1px">RECYCLE CENTER</div><h1 id="title">Dashboard overview</h1><div id="desc" class="muted">Monitor collection activity and bin health.</div></div><div><button class="secondary" id="export">↓ Export CSV</button></div></header>
-<section id="overview" class="page active"><div class="ewaste-banner"><div><strong>♻ E-WASTE RECYCLE CENTER</strong><div style="font-size:12px;opacity:.9">Responsible collection · smart-bin monitoring · circular recovery</div></div><div class="ewaste-icons" aria-label="electronics and recycling">🖥️ 🔌 🔋 ♻</div></div><div class="stats"><div class="stat"><label>Registered bins</label><strong>12</strong><span class="pill">10 online</span></div><div class="stat"><label>Total e-waste collected</label><strong>248.6 kg</strong><span class="muted">Accepted deposits</span></div><div class="stat"><label>Users deposited</label><strong>86</strong><span class="muted">Unique depositing users</span></div><div class="stat"><label>Vehicle trips completed</label><strong id="tripCount">21</strong><span class="muted">Collection history</span></div></div><div class="grid"><div class="card"><div class="cardhead"><div><h2>Dustbin status</h2><div class="sub">Fill levels and collection priority</div></div><button class="secondary" data-go="bins">View all</button></div><div id="overviewBins"></div></div><div class="card"><div class="cardhead"><div><h2>Recent activity</h2><div class="sub">Latest deposits and collections</div></div></div><div id="activity"></div></div></div><div class="card"><h2>Latest deposits</h2><div class="sub">Example records for frontend demonstration</div><div class="tablewrap"><table><thead><tr><th>User</th><th>Bin</th><th>Weight</th><th>Waste type</th><th>Status</th></tr></thead><tbody id="latestDeposits"></tbody></table></div></div></section>
-<section id="binDetail" class="page"><button class="secondary backbtn" id="backToBins">← Back to dustbins</button><div class="top"><div><h1 id="detailTitle">Bin details</h1><div class="muted" id="detailSubtitle">Individual bin monitoring and audit trail</div></div><span id="detailStatus"></span></div><div id="detailContent"></div></section><section id="bins" class="page"><div class="stats"><div class="stat"><label>Total bins</label><strong id="binTotal">5</strong></div><div class="stat"><label>Need collection</label><strong id="pickupCount">2</strong></div><div class="stat"><label>Online</label><strong>4</strong></div><div class="stat"><label>Awaiting pickup</label><strong>34.2 kg</strong></div></div><div class="card"><div class="cardhead"><div><h2>Dustbin monitoring</h2><div class="sub">Waste weight, fill percentage, temperature and status</div></div><button class="primary" id="addBin">+ Add bin</button></div><div class="toolbar"><input class="grow" id="binSearch" placeholder="Search bin ID or location"><select id="binFilter"><option value="all">All statuses</option><option>Normal</option><option>Needs pickup</option><option>Offline</option></select></div><div class="tablewrap"><table><thead><tr><th>🗑️ Bin ID / location</th><th>Weight</th><th>Fill</th><th>Temperature</th><th>Updated</th><th>Status</th></tr></thead><tbody id="binsTable"></tbody></table></div><p class="smallnote">Values are illustrative until the ESP32 is connected to a database. Select any row to open its full details. Sensor thresholds require calibration.</p></div></section>
-<section id="recycling" class="page"><div class="stats"><div class="stat"><label>Awaiting pickup</label><strong>34.2 kg</strong></div><div class="stat"><label>Sent to recyclers</label><strong>214.4 kg</strong></div><div class="stat"><label>Recorded batches</label><strong id="batchCount">3</strong></div><div class="stat"><label>Confirmed recycled</label><strong>14</strong></div></div><div class="card"><div class="cardhead"><div><h2>Recycling history</h2><div class="sub">Track transfer to authorized recycling facilities</div></div><button class="primary" id="addRecycle">+ Record transfer</button></div><div class="toolbar"><input class="grow" id="recycleSearch" placeholder="Search batch, facility or bin"><select id="recycleFilter"><option value="all">All stages</option><option>Awaiting pickup</option><option>Sent to recycler</option><option>Recycled confirmed</option></select></div><div class="tablewrap"><table><thead><tr><th>Batch ID</th><th>Source bin</th><th>Recycler / facility</th><th>Weight</th><th>Date</th><th>Stage</th></tr></thead><tbody id="recycleTable"></tbody></table></div><p class="smallnote">Mark “Recycled confirmed” only after confirmation from the recycler.</p></div></section>
-<section id="vehicles" class="page"><div class="stats"><div class="stat"><label>Total trips</label><strong id="tripTotal">3</strong></div><div class="stat"><label>Completed</label><strong id="tripDone">2</strong></div><div class="stat"><label>Scheduled</label><strong id="tripScheduled">1</strong></div><div class="stat"><label>Weight transported</label><strong>196.8 kg</strong></div></div><div class="card"><div class="cardhead"><div><h2>Vehicle collection history</h2><div class="sub">Track how many times vehicles service each bin</div></div><button class="primary" id="addTrip">+ Schedule collection</button></div><div class="toolbar"><input class="grow" id="tripSearch" placeholder="Search trip, vehicle, driver or bin"><select id="tripFilter"><option value="all">All statuses</option><option>Scheduled</option><option>Completed</option><option>Cancelled</option></select></div><div class="tablewrap"><table><thead><tr><th>Trip ID</th><th>Vehicle number</th><th>Driver</th><th>Bins serviced</th><th>Weight</th><th>Date/time</th><th>Status</th></tr></thead><tbody id="tripsTable"></tbody></table></div></div></section>
-<section id="users" class="page"><div class="stats"><div class="stat"><label>Registered users</label><strong>128</strong></div><div class="stat"><label>Users deposited</label><strong>86</strong></div><div class="stat"><label>Total deposit events</label><strong id="depositCount">5</strong></div><div class="stat"><label>Average sample deposit</label><strong>0.47 kg</strong></div></div><div class="card"><div class="cardhead"><div><h2>User deposit history</h2><div class="sub">User, bin, weight, type and validation result</div></div></div><div class="toolbar"><input class="grow" id="depositSearch" placeholder="Search user, deposit or bin"><select id="depositFilter"><option value="all">All statuses</option><option>Accepted</option><option>Pending review</option><option>Rejected</option></select></div><div class="tablewrap"><table><thead><tr><th>Deposit ID</th><th>User</th><th>Bin</th><th>Weight</th><th>Waste type</th><th>Date</th><th>Status</th></tr></thead><tbody id="depositsTable"></tbody></table></div></div></section>
-<section id="rewards" class="page"><div class="stats"><div class="stat"><label>Points issued</label><strong>18,450</strong></div><div class="stat"><label>Points redeemed</label><strong>6,200</strong></div><div class="stat"><label>Pending vouchers</label><strong>7</strong></div><div class="stat"><label>Vouchers issued</label><strong>84</strong></div></div><div class="card"><h2>Reward transactions</h2><div class="sub">Audit points and voucher activity</div><div class="tablewrap"><table><thead><tr><th>Transaction</th><th>User</th><th>Activity</th><th>Points</th><th>Date</th><th>Status</th></tr></thead><tbody id="rewardsTable"></tbody></table></div><p class="smallnote">In production, point calculation and voucher redemption must be validated by secured backend logic.</p></div></section>
-</main></div><div id="modalHost"></div><div id="toast" class="toast hidden"></div>
-<script src="script.js"></script>
+<body class="auth-pending">
+  <div class="auth-loader">Checking login…</div>
+
+  <div id="app" class="app">
+    <!-- Sidebar + header are filled by js/components/layout.js -->
+    <aside id="sidebar"></aside>
+
+    <main>
+      <header class="top" id="pageHeader"></header>
+
+      <!-- ================= OVERVIEW ================= -->
+      <div class="ewaste-banner">
+        <div>
+          <strong>♻ E-WASTE RECYCLE CENTER</strong>
+          <div class="sub">Responsible collection · smart-bin monitoring · circular recovery</div>
+        </div>
+        <div class="ewaste-icons" aria-label="electronics and recycling">🖥️ 🔌 🔋 ♻</div>
+      </div>
+
+      <div class="stats">
+        <div class="stat"><label>Registered bins</label><strong id="ovBins">0</strong><span class="pill" id="ovOnline">0 online</span></div>
+        <div class="stat"><label>Total e-waste collected</label><strong id="ovCollected">0 kg</strong><span class="muted">Accepted deposits</span></div>
+        <div class="stat"><label>Users deposited</label><strong id="ovUsers">0</strong><span class="muted">Unique depositing users</span></div>
+        <div class="stat"><label>Vehicle trips completed</label><strong id="ovTrips">0</strong><span class="muted">Collection history</span></div>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="cardhead">
+            <div><h2>Dustbin status</h2><div class="sub">Fill levels and collection priority</div></div>
+            <a class="btn secondary" href="html/bins.html">View all</a>
+          </div>
+          <div id="overviewBins"></div>
+        </div>
+        <div class="card">
+          <div class="cardhead">
+            <div><h2>Recent activity</h2><div class="sub">Latest deposits and collections</div></div>
+          </div>
+          <div id="activity"></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="cardhead">
+          <div><h2>Latest deposits</h2><div class="sub">Most recent deposit records</div></div>
+          <a class="btn secondary" href="html/users.html">View all</a>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>User</th><th>Bin</th><th>Weight</th><th>Waste type</th><th>Status</th></tr></thead>
+            <tbody id="latestDeposits"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="modalHost"></div>
+  <div id="toast" class="toast hidden"></div>
+
+  <script type="module" src="js/pages/overview.js"></script>
 </body>
 </html>

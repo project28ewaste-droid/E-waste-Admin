@@ -1,0 +1,58 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Users & deposits | EcoVault Admin</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body class="auth-pending">
+  <div class="auth-loader">Checking login…</div>
+
+  <div id="app" class="app">
+    <!-- Sidebar + header are filled by js/components/layout.js -->
+    <aside id="sidebar"></aside>
+
+    <main>
+      <header class="top" id="pageHeader"></header>
+
+      <!-- ================= USERS & DEPOSITS ================= -->
+      <div class="stats">
+        <div class="stat"><label>Users deposited</label><strong id="depUsers">0</strong></div>
+        <div class="stat"><label>Accepted deposits</label><strong id="depAccepted">0</strong></div>
+        <div class="stat"><label>Total deposit events</label><strong id="depositCount">0</strong></div>
+        <div class="stat"><label>Average deposit</label><strong id="depAverage">0 kg</strong></div>
+      </div>
+
+      <div class="card">
+        <div class="cardhead">
+          <div><h2>User deposit history</h2><div class="sub">User, bin, weight, type and validation result</div></div>
+        </div>
+        <div class="toolbar">
+          <input class="grow" id="depositSearch" placeholder="Search user, deposit or bin">
+          <select id="depositFilter">
+            <option value="all">All statuses</option>
+            <option>Accepted</option>
+            <option>Pending review</option>
+            <option>Rejected</option>
+          </select>
+        </div>
+        <div class="tablewrap">
+          <table>
+            <thead><tr><th>Deposit ID</th><th>User</th><th>Bin</th><th>Weight</th><th>Waste type</th><th>Date</th><th>Status</th></tr></thead>
+            <tbody id="depositsTable"></tbody>
+          </table>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="modalHost"></div>
+  <div id="toast" class="toast hidden"></div>
+
+  <script type="module" src="../js/pages/users.js"></script>
+</body>
+</html>

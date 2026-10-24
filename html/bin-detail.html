@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Bin details | EcoVault Admin</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/responsive.css">
+</head>
+<body class="auth-pending">
+  <div class="auth-loader">Checking login…</div>
+
+  <div id="app" class="app">
+    <!-- Sidebar + header are filled by js/components/layout.js -->
+    <aside id="sidebar"></aside>
+
+    <main>
+      <header class="top" id="pageHeader"></header>
+
+      <!-- ================= BIN DETAIL (bin-detail.html?id=B01) ================= -->
+      <a class="btn secondary backbtn" href="bins.html">← Back to dustbins</a>
+      <div class="top">
+        <div>
+          <h1 id="detailTitle">Bin details</h1>
+          <div class="muted" id="detailSubtitle">Individual bin monitoring and audit trail</div>
+        </div>
+        <span id="detailStatus"></span>
+      </div>
+      <div id="detailContent"></div>
+    </main>
+  </div>
+
+  <div id="modalHost"></div>
+  <div id="toast" class="toast hidden"></div>
+
+  <script type="module" src="../js/pages/bin-detail.js"></script>
+</body>
+</html>
