@@ -6,6 +6,7 @@
 //     collections: ["bins"],             // keys from COLLECTIONS in config/app-config.js
 //     init: () => { ... },               // optional: wire up buttons / search boxes once
 //     render: () => { ... },             // redraw the page whenever data changes
+//     bare: true,                        // optional: no sidebar/header (user-facing test screens)
 //   });
 import { requireAuth, logout } from "./auth.js";
 import { downloadCsv } from "./utils/export-csv.js";
@@ -31,6 +32,7 @@ async function exportDeposits() {
 function wireBinLinks() {
   const open = el => (location.href = binDetailUrl(el.dataset.bin));
   document.body.addEventListener("click", e => {
+    if (e.target.closest("button, a")) return; // buttons inside a row (e.g. Live data) do their own thing
     const el = e.target.closest("[data-bin]");
     if (el) open(el);
   });
@@ -42,20 +44,22 @@ function wireBinLinks() {
   });
 }
 
-export async function startPage({ page, collections, init, render }) {
+export async function startPage({ page, collections, init, render, bare = false }) {
   const user = await requireAuth();
   if (!user) return;
 
-  renderLayout(page, user);
-  $("logoutBtn").onclick = logout;
-  $("export").onclick = () =>
-    exportDeposits().catch(err => toast(`Export failed: ${err.code || err.message}`));
-  wireBinLinks();
+  if (!bare) {
+    renderLayout(page, user);
+    $("logoutBtn").onclick = logout;
+    $("export").onclick = () =>
+      exportDeposits().catch(err => toast(`Export failed: ${err.code || err.message}`));
+    wireBinLinks();
+  }
   init?.();
 
   document.body.classList.remove("auth-pending");
   subscribe(collections, () => {
     render();
-    setSourceBadge(hasErrors());
+    if (!bare) setSourceBadge(hasErrors());
   });
 }

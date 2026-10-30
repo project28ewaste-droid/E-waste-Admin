@@ -257,6 +257,51 @@ tr[data-bin]:hover {
   overflow: auto;
 }
 
+/* ---------- Live sensor panel ---------- */
+.live-modal {
+  width: min(760px, 100%);
+}
+
+.live-dot {
+  font-size: 11px;
+  color: #d33;
+  vertical-align: middle;
+  animation: blink 1.4s infinite;
+}
+
+@keyframes blink {
+  50% { opacity: 0.25; }
+}
+
+.sensor-head {
+  font-size: 14px;
+  margin: 18px 0 8px;
+}
+
+.sensor-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+  gap: 10px;
+}
+
+.sensor-tile {
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #f8fbf9;
+}
+
+.sensor-value {
+  margin-top: 4px;
+  font-size: 18px;
+  word-break: break-word;
+}
+
+.small-btn {
+  padding: 6px 10px;
+  font-size: 12px;
+}
+
 .actions {
   display: flex;
   justify-content: flex-end;

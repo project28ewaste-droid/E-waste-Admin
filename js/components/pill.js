@@ -4,7 +4,7 @@ import { FILL_ALERT_LEVEL } from "../config/app-config.js";
 
 // Statuses shown in orange / red. Anything else is green.
 const WARN_STATUSES = ["Checking…", "Needs pickup", "Scheduled", "Pending review", "Pending", "Sent to recycler", "Awaiting pickup"];
-const BAD_STATUSES = ["Offline", "Rejected", "Cancelled"];
+const BAD_STATUSES = ["Offline", "Rejected", "Cancelled", "Not okay"];
 
 export function pill(status) {
   const tone = WARN_STATUSES.includes(status) ? "warn" : BAD_STATUSES.includes(status) ? "bad" : "";

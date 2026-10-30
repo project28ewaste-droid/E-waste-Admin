@@ -45,6 +45,34 @@ export const DEVICE_CHECK = {
   intervalSeconds: 30,
 };
 
+// Commands for the ESP32, written to Realtime Database bins/<MAC>/<node>/...
+//   Working test step 1 "Open"         → Operations = { Door: 1 }  (all other values deleted)
+//   Step 2 waste type chosen (+2 s)    → Operations/Door = 0, Operations/sensor = "updates"
+//   ESP32 then, 5 s apart              → Operations/weight_g, Operations/temp_c, Operations/wet,
+//                                        finally Operations/sensor = "done"
+export const OPERATIONS = {
+  node: "Operations",
+  doorField: "Door",
+  doorOpen: 1,
+  doorClose: 0,
+  sensorField: "sensor",
+  sensorUpdates: "updates",
+  sensorDone: "done",
+  closeDelayMs: 2000, // wait after choosing the waste type before closing the door
+  stepDelayMs: 5000,  // ESP32 waits this long before each check (used for the countdown)
+
+  // Checks done by the ESP32, in order. `field` = key it writes under Operations/.
+  checks: [
+    { field: "weight_g", label: "Weight", icon: "⚖️", unit: "g" },
+    { field: "temp_c", label: "Temperature", icon: "🌡️", unit: "°C" },
+    { field: "wet", label: "Wet Sensor", icon: "💧", values: { 0: "Okay", 1: "Not okay" } }, // 0 = okay, 1 = not okay
+  ],
+};
+
+// Inside depth of the bin in cm (ultrasonic sensor to bottom). Used to turn
+// sensors/distance_cm into a fill %. Measure your bin and change this.
+export const BIN_DEPTH_CM = 30;
+
 // Fill % at which a bin's bar turns orange (and counts as "needs collection").
 export const FILL_ALERT_LEVEL = 80;
 
@@ -52,3 +80,15 @@ export const FILL_ALERT_LEVEL = 80;
 export const DASHBOARD_PAGE = "index.html";
 export const LOGIN_PAGE = "html/login.html";
 export const BIN_DETAIL_PAGE = "html/bin-detail.html";
+
+// "Working test" demo screens (what a user sees at the bin).
+export const TEST_PAGE = "html/test.html";              // step 1: choose a dustbin
+export const TEST_WASTE_PAGE = "html/test-waste.html";  // step 2: choose the waste type
+export const TEST_SENSORS_PAGE = "html/test-sensors.html"; // step 3: sensor values
+
+// Waste types shown on step 2. `id` is the value that will be sent/saved later.
+export const WASTE_TYPES = [
+  { id: "board", label: "BOARD", icon: "🖥️", hint: "Circuit boards, PCBs, motherboards" },
+  { id: "battery", label: "BATTERY", icon: "🔋", hint: "Cells, power banks, phone batteries" },
+  { id: "wires", label: "WIRES & others", icon: "🔌", hint: "Cables, chargers, small parts" },
+];

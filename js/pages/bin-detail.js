@@ -3,6 +3,7 @@ import { startPage } from "../app.js";
 import { $, safe, emptyRow } from "../utils/dom.js";
 import { kg, sum, timeAgo, splitIds } from "../utils/format.js";
 import { pill, fillBar } from "../components/pill.js";
+import { liveSensorsHtml } from "../components/live-panel.js";
 import { state } from "../store.js";
 
 const currentBinId = new URLSearchParams(location.search).get("id");
@@ -65,22 +66,16 @@ function renderBinDetail() {
       <div class="stat"><label>Waste weight (sensor)</label><strong>${kg(b.weight)}</strong><span class="muted">Last reply ${updated}</span></div>
     </div>
 
-    <div class="grid">
-      <div class="card">
-        <h2>Current sensor readings</h2>
-        <div class="tablewrap"><table><tbody>
-          <tr><th>Fill sensor</th><td>${b.fill}%</td></tr>
-          <tr><th>Weight sensor</th><td>${kg(b.weight)}</td></tr>
-          <tr><th>Temperature</th><td>${b.temp === null ? "No reading" : `${b.temp} °C`}</td></tr>
-          <tr><th>Connectivity / status</th><td>${pill(b.status)}</td></tr>
-          <tr><th>Last reply</th><td>${updated}</td></tr>
-        </tbody></table></div>
-      </div>
-      <div class="card">
-        <h2>♻ Waste categories</h2>
-        <div class="sub">Accepted deposit weights by category</div>
-        ${table(["Waste type", "Weight"], categoryRows)}
-      </div>
+    <div class="card">
+      <h2>📡 Live sensor data <span class="live-dot">● LIVE</span></h2>
+      <div class="sub">Straight from Realtime Database bins/${safe(b.id)} · ${pill(b.status)}</div>
+      ${liveSensorsHtml(b)}
+    </div>
+
+    <div class="card">
+      <h2>♻ Waste categories</h2>
+      <div class="sub">Accepted deposit weights by category</div>
+      ${table(["Waste type", "Weight"], categoryRows)}
     </div>
 
     <div class="card">

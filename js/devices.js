@@ -3,9 +3,9 @@
 // Every key under DEVICE_CHECK.path (e.g. "bins/3076F5064CD0") is one bin.
 // For each bin we write Question = "Hi" and clear Answer, then wait for the ESP32
 // to write Answer = "am there". Reply in time → "Online", otherwise "Offline".
-// Afterwards Question is cleared again, so the next "Hi" is always a fresh change.
-import { rtdb, ref, onValue, update } from "./firebase.js";
-import { DEVICE_CHECK as C } from "./config/app-config.js";
+// The ESP32 then deletes Question (firmware: firebaseCheckQuestion(), checks every 1 s).
+import { rtdb, ref, onValue, update, set } from "./firebase.js";
+import { DEVICE_CHECK as C, OPERATIONS } from "./config/app-config.js";
 
 // mac -> { status: "Checking…" | "Online" | "Offline", lastSeen: ms | null, data: {...other RTDB fields}, pinging }
 export const devices = {};
@@ -46,8 +46,9 @@ async function ping(mac, onChange) {
     const online = await waitForAnswer(mac);
     device.status = online ? "Online" : "Offline";
     if (online) device.lastSeen = Date.now();
+    // The ESP32 deletes Question after answering; delete it on timeout too (null = delete).
     // Only touch the node if the bin still exists (avoid re-creating a deleted MAC).
-    if (devices[mac]) await update(node, { [C.questionField]: "" });
+    if (devices[mac] && !online) await update(node, { [C.questionField]: null });
   } catch (err) {
     console.error(`Online check failed for ${mac}:`, err);
     device.status = "Offline";
@@ -55,6 +56,20 @@ async function ping(mac, onChange) {
 
   device.pinging = false;
   onChange();
+}
+
+// Sends commands to one bin in a single write: bins/<MAC>/Operations/{field: value, ...}.
+export function setOperations(mac, fields) {
+  if (!devices[mac]) return Promise.reject(new Error(`Dustbin ${mac} not found`));
+  return update(ref(rtdb, `${C.path}/${mac}/${OPERATIONS.node}`), fields);
+}
+
+export const setOperation = (mac, field, value) => setOperations(mac, { [field]: value });
+
+// Replaces the whole Operations node: only the given fields remain, everything else is deleted.
+export function replaceOperations(mac, fields) {
+  if (!devices[mac]) return Promise.reject(new Error(`Dustbin ${mac} not found`));
+  return set(ref(rtdb, `${C.path}/${mac}/${OPERATIONS.node}`), fields);
 }
 
 // Starts watching the bin list and checking each bin. `onChange` runs on every update.

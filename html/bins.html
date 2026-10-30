@@ -30,7 +30,10 @@
       <div class="card">
         <div class="cardhead">
           <div><h2>Dustbin monitoring</h2><div class="sub">One row per ESP32 bin (MAC address) · online status checked live</div></div>
-          <button class="primary" id="setLocation">✎ Set bin location</button>
+          <div class="btn-row">
+            <a class="btn secondary" href="test.html">🧪 Working test</a>
+            <button class="primary" id="setLocation">✎ Set bin location</button>
+          </div>
         </div>
         <div class="toolbar">
           <input class="grow" id="binSearch" placeholder="Search MAC address or location">
@@ -43,11 +46,11 @@
         </div>
         <div class="tablewrap">
           <table>
-            <thead><tr><th>🗑️ Bin (MAC) / location</th><th>Weight</th><th>Fill</th><th>Temperature</th><th>Last reply</th><th>Status</th></tr></thead>
+            <thead><tr><th>🗑️ Bin (MAC) / location</th><th>Weight</th><th>Fill</th><th>Temperature</th><th>Last reply</th><th>Status</th><th>Sensors</th></tr></thead>
             <tbody id="binsTable"></tbody>
           </table>
         </div>
-        <p class="smallnote">Each bin is asked “Hi” every 30 seconds; it shows Online when the ESP32 answers “am there”. Select a row for full details.</p>
+        <p class="smallnote">Each bin is asked “Hi” every 30 seconds; it shows Online when the ESP32 answers “am there”. Click “Live data” for all sensor values, or a row for full details.</p>
       </div>
     </main>
   </div>

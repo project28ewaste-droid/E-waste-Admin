@@ -2,7 +2,7 @@
 // The pages show exactly what is in Firestore — empty collections show empty tables.
 // Exception: the list of bins and their Online/Offline status come from devices.js (Realtime Database).
 import { db, collection, doc, onSnapshot, getDocs, setDoc } from "./firebase.js";
-import { COLLECTIONS, DEVICE_CHECK } from "./config/app-config.js";
+import { COLLECTIONS, DEVICE_CHECK, BIN_DEPTH_CM } from "./config/app-config.js";
 import { devices, deviceError, watchDevices } from "./devices.js";
 import { num, formatDate } from "./utils/format.js";
 
@@ -25,7 +25,7 @@ const normalize = {
     ...b,
     weight: num(b.weight),
     fill: num(b.fill),
-    temp: b.temp == null || b.temp === "" ? null : num(b.temp),
+    temp: b.temp == null || b.temp === "" || !Number.isFinite(Number(b.temp)) ? null : Number(b.temp),
     updated: b.updated instanceof Date ? b.updated.getTime() : b.updated,
   }),
   deposits: d => ({ ...d, weight: num(d.weight), date: formatDate(d.date) }),
@@ -53,21 +53,40 @@ function toList(name, snapshot) {
 
 let binDetails = {}; // Firestore bins docs by MAC
 
-// One bin per MAC in Realtime Database; Firestore doc adds location etc.; status = online check.
+const numOrNull = v => (v === null || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
+
+// Fill % from the ultrasonic distance (empty bin = BIN_DEPTH_CM away, full = 0 cm).
+function fillFromDistance(cm) {
+  const d = numOrNull(cm);
+  if (d === null) return null;
+  return Math.round(Math.max(0, Math.min(100, ((BIN_DEPTH_CM - d) / BIN_DEPTH_CM) * 100)));
+}
+
+// One bin per MAC in Realtime Database; Firestore doc adds location; status = online check.
+// `live` keeps the raw ESP32 data (sensors, servos, wifi, …) for the Live data panel.
 function rebuildBins() {
   state.bins = Object.entries(devices)
-    .map(([mac, d]) =>
-      normalize.bins({
+    .map(([mac, d]) => {
+      const details = binDetails[mac] || {};
+      const s = d.data.sensors || {};
+      const grams = numOrNull(s.weight_g);
+      return normalize.bins({
         loc: "Location not set",
-        ...binDetails[mac],
-        ...d.data,
+        ...details,
         id: mac,
+        weight: grams !== null ? grams / 1000 : details.weight,
+        temp: numOrNull(s.temp_c) ?? details.temp,
+        fill: fillFromDistance(s.distance_cm) ?? details.fill,
         status: d.status,
         updated: d.lastSeen ?? undefined,
-      })
-    )
+        live: d.data,
+      });
+    })
     .sort(sorters.bins);
 }
+
+// Dustbin name shown to users: its location if set, otherwise the MAC address.
+export const binName = b => (b.loc && b.loc !== "Location not set" ? b.loc : `Dustbin ${b.id}`);
 
 function subscribeBins(onChange) {
   watchDevices(() => {

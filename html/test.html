@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Working test | EcoVault</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/test.css">
+</head>
+<body class="auth-pending">
+  <div class="auth-loader">Checking login…</div>
+
+  <!-- ================= WORKING TEST · STEP 1: CHOOSE DUSTBIN ================= -->
+  <div id="app" class="test-screen">
+    <div class="test-top">
+      <div class="brand">♻ EcoVault</div>
+      <a class="btn secondary" href="bins.html">← Back to admin</a>
+    </div>
+
+    <div class="test-title">
+      <span class="step-badge">WORKING TEST · STEP 1 OF 3</span>
+      <h1>Choose a dustbin</h1>
+      <div class="muted">Select the dustbin you are standing at and tap <b>Open</b>.</div>
+    </div>
+
+    <div class="test-bins" id="testBins"></div>
+  </div>
+
+  <div id="modalHost"></div>
+  <div id="toast" class="toast hidden"></div>
+
+  <script type="module" src="../js/pages/test-select.js"></script>
+</body>
+</html>

@@ -112,6 +112,14 @@ main {
   flex-wrap: wrap;
 }
 
+/* A few buttons side by side (stays visible on phones) */
+.btn-row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
 .eyebrow {
   color: var(--g);
   font-size: 12px;

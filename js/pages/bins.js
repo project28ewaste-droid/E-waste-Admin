@@ -5,6 +5,7 @@ import { kg, timeAgo } from "../utils/format.js";
 import { pill, fillBar } from "../components/pill.js";
 import { openModal } from "../components/modal.js";
 import { toast } from "../components/toast.js";
+import { openLivePanel, refreshLivePanel } from "../components/live-panel.js";
 import { state, saveRecord, emptyMessage } from "../store.js";
 import { FILL_ALERT_LEVEL } from "../config/app-config.js";
 
@@ -21,7 +22,10 @@ const binRow = b => `
     <td>${b.temp === null ? "—" : `${b.temp}°C`}</td>
     <td>${safe(timeAgo(b.updated))}</td>
     <td>${pill(b.status)}</td>
+    <td><button class="secondary small-btn" data-live="${safe(b.id)}">📡 Live data</button></td>
   </tr>`;
+
+const findBin = mac => state.bins.find(b => b.id === mac);
 
 export function renderBins() {
   const q = searchValue("binSearch");
@@ -30,7 +34,8 @@ export function renderBins() {
     b => `${b.id} ${b.loc}`.toLowerCase().includes(q) && (status === "all" || b.status === status)
   );
 
-  $("binsTable").innerHTML = list.map(binRow).join("") || emptyRow(6, emptyMessage("bins", state.bins.length > 0));
+  $("binsTable").innerHTML = list.map(binRow).join("") || emptyRow(7, emptyMessage("bins", state.bins.length > 0));
+  refreshLivePanel();
 
   $("binTotal").textContent = state.bins.length;
   $("pickupCount").textContent = state.bins.filter(b => b.fill >= FILL_ALERT_LEVEL).length;
@@ -54,6 +59,10 @@ function openSetLocation() {
 export function initBins() {
   onInputs(["binSearch", "binFilter"], renderBins);
   $("setLocation").onclick = openSetLocation;
+  $("binsTable").addEventListener("click", e => {
+    const btn = e.target.closest("[data-live]");
+    if (btn) openLivePanel(btn.dataset.live, findBin);
+  });
 }
 
 startPage({ page: "bins", collections: ["bins"], init: initBins, render: renderBins });

@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Sensor values | EcoVault</title>
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="../css/layout.css">
+  <link rel="stylesheet" href="../css/components.css">
+  <link rel="stylesheet" href="../css/test.css">
+</head>
+<body class="auth-pending">
+  <div class="auth-loader">Checking login…</div>
+
+  <!-- ================= WORKING TEST · STEP 3: SENSOR VALUES (test-sensors.html?id=<MAC>&type=<waste>) ================= -->
+  <div id="app" class="test-screen">
+    <div class="test-top">
+      <div class="brand">♻ EcoVault</div>
+      <a class="btn secondary" href="test.html">✓ Finish / new test</a>
+    </div>
+
+    <div class="test-title">
+      <span class="step-badge">WORKING TEST · STEP 3 OF 3</span>
+      <h1>Checking your waste <span class="live-dot">● LIVE</span></h1>
+      <div class="muted" id="testBinInfo">Loading dustbin…</div>
+      <div class="muted">Waste type: <b id="testWaste">—</b></div>
+    </div>
+
+    <div class="card check-card">
+      <div id="checkSteps"></div>
+      <div class="test-result" id="checkStatus"></div>
+    </div>
+  </div>
+
+  <div id="modalHost"></div>
+  <div id="toast" class="toast hidden"></div>
+
+  <script type="module" src="../js/pages/test-sensors.js"></script>
+</body>
+</html>
