@@ -47,9 +47,11 @@ export const DEVICE_CHECK = {
 
 // Commands for the ESP32, written to Realtime Database bins/<MAC>/<node>/...
 //   Working test step 1 "Open"         → Operations = { Door: 1 }  (all other values deleted)
-//   Step 2 waste type chosen (+2 s)    → Operations/Door = 0, Operations/sensor = "updates"
-//   ESP32 then, 5 s apart              → Operations/weight_g, Operations/temp_c, Operations/wet,
+//   Step 2 waste type chosen           → Operations/cylinder = 1 (board) / 2 (battery) / 3 (wires)
+//   Step 2, 2 s later                  → Operations/Door = 0, Operations/sensor = "updates"
+//   ESP32 then, 5 s apart              → Operations/weight_g, Operations/temp_c, Operations/wet, Operations/proximity,
 //                                        finally Operations/sensor = "done"
+//   Step 3, checks complete            → Operations/Tray = 1
 export const OPERATIONS = {
   node: "Operations",
   doorField: "Door",
@@ -58,6 +60,9 @@ export const OPERATIONS = {
   sensorField: "sensor",
   sensorUpdates: "updates",
   sensorDone: "done",
+  cylinderField: "cylinder", // step 2: sent the moment a waste type is selected (1 / 2 / 3, see WASTE_TYPES)
+  trayField: "Tray", // step 3: sent as soon as all checks are complete → Operations/Tray = 1
+  trayValue: 1,
   closeDelayMs: 2000, // wait after choosing the waste type before closing the door
   stepDelayMs: 5000,  // ESP32 waits this long before each check (used for the countdown)
 
@@ -66,12 +71,13 @@ export const OPERATIONS = {
     { field: "weight_g", label: "Weight", icon: "⚖️", unit: "g" },
     { field: "temp_c", label: "Temperature", icon: "🌡️", unit: "°C" },
     { field: "wet", label: "Wet Sensor", icon: "💧", values: { 0: "Okay", 1: "Not okay" } }, // 0 = okay, 1 = not okay
+    { field: "proximity", label: "Proximity Sensor", icon: "📡", values: { 0: "Not detected", 1: "Detected" } },
   ],
 };
 
-// Inside depth of the bin in cm (ultrasonic sensor to bottom). Used to turn
-// sensors/distance_cm into a fill %. Measure your bin and change this.
-export const BIN_DEPTH_CM = 30;
+// Dustbin height in cm (ultrasonic sensor to bottom). Turns sensors/distance_cm into fill %:
+//   distance ≥ 9 cm → 0% filled (empty),  distance 0 cm → 100% filled (full).
+export const BIN_DEPTH_CM = 9;
 
 // Fill % at which a bin's bar turns orange (and counts as "needs collection").
 export const FILL_ALERT_LEVEL = 80;
@@ -86,9 +92,9 @@ export const TEST_PAGE = "html/test.html";              // step 1: choose a dust
 export const TEST_WASTE_PAGE = "html/test-waste.html";  // step 2: choose the waste type
 export const TEST_SENSORS_PAGE = "html/test-sensors.html"; // step 3: sensor values
 
-// Waste types shown on step 2. `id` is the value that will be sent/saved later.
+// Waste types shown on step 2. `cylinder` is sent to Operations/cylinder when the type is selected.
 export const WASTE_TYPES = [
-  { id: "board", label: "BOARD", icon: "🖥️", hint: "Circuit boards, PCBs, motherboards" },
-  { id: "battery", label: "BATTERY", icon: "🔋", hint: "Cells, power banks, phone batteries" },
-  { id: "wires", label: "WIRES & others", icon: "🔌", hint: "Cables, chargers, small parts" },
+  { id: "board", label: "BOARD", icon: "🖥️", hint: "Circuit boards, PCBs, motherboards", cylinder: 1 },
+  { id: "battery", label: "BATTERY", icon: "🔋", hint: "Cells, power banks, phone batteries", cylinder: 2 },
+  { id: "wires", label: "WIRES & others", icon: "🔌", hint: "Cables, chargers, small parts", cylinder: 3 },
 ];

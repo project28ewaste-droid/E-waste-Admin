@@ -1,11 +1,13 @@
 // Working test · step 3 (test-sensors.html?id=<MAC>&type=<waste id>).
 // The ESP32 sees Operations/sensor = "updates" and, 5 s apart, writes
-// Operations/weight → Operations/temperature → Operations/rain, then sensor = "done".
+// Operations/weight_g → temp_c → wet → proximity, then sensor = "done".
 // This page shows each check in order: waiting → countdown → value.
+// As soon as the checks are complete it sends Operations/Tray = 1 (once).
 import { startPage } from "../app.js";
 import { $, safe } from "../utils/dom.js";
 import { pill } from "../components/pill.js";
 import { state, binName } from "../store.js";
+import { setOperation } from "../devices.js";
 import { pageUrl, isReload } from "../utils/paths.js";
 import { WASTE_TYPES, OPERATIONS, TEST_PAGE } from "../config/app-config.js";
 
@@ -17,6 +19,9 @@ const waste = WASTE_TYPES.find(w => w.id === params.get("type"));
 let activeIndex = -1;
 let activeSince = Date.now();
 
+// Tray command after the checks: null → "sending" → "sent" | "error"
+let trayState = null;
+
 const hasValue = v => v !== undefined && v !== null && v !== "";
 
 function formatResult(check, value) {
@@ -25,13 +30,15 @@ function formatResult(check, value) {
   return `<b>${safe(value)}</b>${check.unit ? ` <span class="sub">${safe(check.unit)}</span>` : ""}`;
 }
 
-function stepHtml(check, index, value) {
+// deviceDone = ESP32 already said sensor: "done", so a missing value will never arrive.
+function stepHtml(check, index, value, deviceDone) {
   const done = hasValue(value);
-  const active = index === activeIndex;
+  const active = index === activeIndex && !deviceDone;
   let right = '<span class="sub">Waiting…</span>';
   let progress = "";
 
   if (done) right = formatResult(check, value);
+  else if (deviceDone) right = '<span class="pill bad">No reading</span>';
   else if (active) {
     const elapsed = Date.now() - activeSince;
     const left = Math.ceil((OPERATIONS.stepDelayMs - elapsed) / 1000);
@@ -53,6 +60,25 @@ function stepHtml(check, index, value) {
     </div>`;
 }
 
+// Sends Operations/Tray = 1 once the checks are complete.
+async function sendTray() {
+  trayState = "sending";
+  try {
+    await setOperation(binId, OPERATIONS.trayField, OPERATIONS.trayValue);
+    trayState = "sent";
+  } catch (err) {
+    console.error(err);
+    trayState = "error";
+  }
+  renderTestSensors();
+}
+
+// The tray command is sent silently; only a failure is shown (with Retry).
+function trayHtml() {
+  if (trayState === "error") return '<p><span class="pill bad">Could not send tray command</span> <button class="secondary small-btn" id="retryTray">Retry</button></p>';
+  return "";
+}
+
 function renderTestSensors() {
   const bin = state.bins.find(b => b.id === binId);
   $("testBinInfo").innerHTML = bin
@@ -62,6 +88,7 @@ function renderTestSensors() {
 
   const ops = bin?.live?.[OPERATIONS.node] || {};
   const values = OPERATIONS.checks.map(c => ops[c.field]);
+  const deviceDone = ops[OPERATIONS.sensorField] === OPERATIONS.sensorDone;
 
   const nextIndex = values.findIndex(v => !hasValue(v));
   if (nextIndex !== activeIndex) {
@@ -69,17 +96,24 @@ function renderTestSensors() {
     activeSince = Date.now();
   }
 
-  $("checkSteps").innerHTML = OPERATIONS.checks.map((c, i) => stepHtml(c, i, values[i])).join("");
+  $("checkSteps").innerHTML = OPERATIONS.checks.map((c, i) => stepHtml(c, i, values[i], deviceDone)).join("");
 
-  const finished = nextIndex === -1 || ops[OPERATIONS.sensorField] === OPERATIONS.sensorDone;
-  $("checkStatus").innerHTML = finished
-    ? '<span class="pill">✓ All checks complete</span>'
-    : `<span class="sub">Device status: <b>${safe(ops[OPERATIONS.sensorField] ?? "—")}</b></span>`;
+  const allValues = nextIndex === -1;
+  const finished = allValues || deviceDone;
+  if (finished && bin && trayState === null) sendTray();
+
+  let status = `<span class="sub">Device status: <b>${safe(ops[OPERATIONS.sensorField] ?? "—")}</b></span>`;
+  if (allValues) status = '<span class="pill">✓ All checks complete</span>';
+  else if (deviceDone) status = '<span class="pill warn">Checks finished — some sensors gave no reading</span>';
+  $("checkStatus").innerHTML = status + trayHtml();
 }
 
-// Re-draw a few times a second so the countdown moves between Firebase updates.
 function initTestSensors() {
+  // Re-draw a few times a second so the countdown moves between Firebase updates.
   setInterval(() => state.bins.length && renderTestSensors(), 250);
+  $("checkStatus").addEventListener("click", e => {
+    if (e.target.id === "retryTray") sendTray();
+  });
 }
 
 // Refreshing any test step starts the test again from "Choose a dustbin".

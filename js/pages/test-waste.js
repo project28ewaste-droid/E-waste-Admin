@@ -1,5 +1,6 @@
 // Working test · step 2 (test-waste.html?id=<MAC>): the user picks which type of waste they are putting in.
-// After choosing, wait OPERATIONS.closeDelayMs (2 s), then in one write:
+// On choosing:  Operations/cylinder = 1 (board) / 2 (battery) / 3 (wires)  — straight away.
+// 2 s later (OPERATIONS.closeDelayMs), in one write:
 //   Operations/Door = 0 and Operations/sensor = "updates" → then go to step 3.
 // (Old results were already deleted when "Open" was pressed on step 1.)
 import { startPage } from "../app.js";
@@ -56,10 +57,15 @@ async function onWasteSelected(type) {
   submitting = true;
   selected = type.id;
   renderTestWaste();
-  $("testResult").innerHTML = `<span class="pill">Selected: ${safe(type.label)}</span><p class="muted">Closing the door…</p>`;
+  $("testResult").innerHTML =
+    `<span class="pill">Selected: ${safe(type.label)} · Cylinder ${safe(type.cylinder)}</span><p class="muted">Closing the door…</p>`;
 
-  await wait(OPERATIONS.closeDelayMs);
   try {
+    // Right away: tell the ESP32 which cylinder (1 board / 2 battery / 3 wires). The 2 s door delay runs alongside.
+    await Promise.all([
+      setOperations(binId, { [OPERATIONS.cylinderField]: type.cylinder }),
+      wait(OPERATIONS.closeDelayMs),
+    ]);
     await setOperations(binId, {
       [OPERATIONS.doorField]: OPERATIONS.doorClose,
       [OPERATIONS.sensorField]: OPERATIONS.sensorUpdates,
@@ -67,8 +73,8 @@ async function onWasteSelected(type) {
     location.href = `${pageUrl(TEST_SENSORS_PAGE)}?id=${encodeURIComponent(binId)}&type=${encodeURIComponent(type.id)}`;
   } catch (err) {
     console.error(err);
-    toast(`Could not close the door: ${err.code || err.message}`);
-    $("testResult").innerHTML = `<span class="pill bad">Failed to close the door — tap a waste type to retry.</span>`;
+    toast(`Could not update the dustbin: ${err.code || err.message}`);
+    $("testResult").innerHTML = `<span class="pill bad">Failed to update the dustbin — tap a waste type to retry.</span>`;
     submitting = false;
     selected = null;
     renderTestWaste();

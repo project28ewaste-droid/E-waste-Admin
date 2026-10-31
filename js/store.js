@@ -2,9 +2,9 @@
 // The pages show exactly what is in Firestore — empty collections show empty tables.
 // Exception: the list of bins and their Online/Offline status come from devices.js (Realtime Database).
 import { db, collection, doc, onSnapshot, getDocs, setDoc } from "./firebase.js";
-import { COLLECTIONS, DEVICE_CHECK, BIN_DEPTH_CM } from "./config/app-config.js";
+import { COLLECTIONS, DEVICE_CHECK } from "./config/app-config.js";
 import { devices, deviceError, watchDevices } from "./devices.js";
-import { num, formatDate } from "./utils/format.js";
+import { num, numOrNull, formatDate, fillFromDistance } from "./utils/format.js";
 
 // Current records for each collection (always arrays).
 export const state = { bins: [], deposits: [], trips: [], recycling: [], rewards: [] };
@@ -52,15 +52,6 @@ function toList(name, snapshot) {
 // ---------- Bins = ESP32 MACs (Realtime Database) + details (Firestore) ----------
 
 let binDetails = {}; // Firestore bins docs by MAC
-
-const numOrNull = v => (v === null || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
-
-// Fill % from the ultrasonic distance (empty bin = BIN_DEPTH_CM away, full = 0 cm).
-function fillFromDistance(cm) {
-  const d = numOrNull(cm);
-  if (d === null) return null;
-  return Math.round(Math.max(0, Math.min(100, ((BIN_DEPTH_CM - d) / BIN_DEPTH_CM) * 100)));
-}
 
 // One bin per MAC in Realtime Database; Firestore doc adds location; status = online check.
 // `live` keeps the raw ESP32 data (sensors, servos, wifi, …) for the Live data panel.

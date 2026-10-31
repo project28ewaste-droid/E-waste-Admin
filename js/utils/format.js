@@ -1,9 +1,20 @@
 // Number, weight and time formatting.
+import { BIN_DEPTH_CM } from "../config/app-config.js";
 
 export const num = v => {
   const n = Number(v);
   return Number.isFinite(n) ? n : 0;
 };
+
+// Number, or null when missing / "error" / not a number.
+export const numOrNull = v => (v === null || v === undefined || v === "" || !Number.isFinite(Number(v)) ? null : Number(v));
+
+// Fill % from the ultrasonic distance: BIN_DEPTH_CM (or more) away = 0%, 0 cm = 100%.
+export function fillFromDistance(cm) {
+  const d = numOrNull(cm);
+  if (d === null) return null;
+  return Math.round(Math.max(0, Math.min(100, ((BIN_DEPTH_CM - d) / BIN_DEPTH_CM) * 100)));
+}
 
 export const kg = (v, digits = 1) => `${num(v).toFixed(digits)} kg`;
 
